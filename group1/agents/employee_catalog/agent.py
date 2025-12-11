@@ -1,11 +1,13 @@
+import asyncio
 import os
 
+import langchain.messages
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
 
-load_dotenv()
+load_dotenv(override=True)
 
 client = MultiServerMCPClient({  # type: ignore
     "employee_catalog": {
@@ -31,8 +33,21 @@ async def get_agent():
     )
 
 
-if __name__ == "__main__":
+async def main():
     # Example of how to run the agent
     agent = await get_agent()
-    response = agent.invoke({"input": "What is the name of the employee with id 1?"})
+    messages = [
+        {'role': 'system', 'content': "You are a helpful assistant"},
+        {'role': 'user', 'content': "What is the name of the employee with id 1?"},
+    ]
+    response = await agent.ainvoke({'messages': messages})
     print(response)
+    # messages.append(response)
+
+    # # Print messages
+    # for message in messages:
+    #     print()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
