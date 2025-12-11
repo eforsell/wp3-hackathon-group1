@@ -12,8 +12,8 @@ from a2a.server.tasks import (BasePushNotificationSender,
 from a2a.types import AgentCapabilities, AgentCard, AgentSkill
 from dotenv import load_dotenv
 
-from .agent import EmployeeCatalogAgent
-from .agent_executor import EmployeeCatalogAgentExecutor
+from .agent import ServiceCatalogAgent
+from .agent_executor import ServiceCatalogAgentExecutor
 
 load_dotenv()
 
@@ -31,9 +31,9 @@ class MissingAPIKeyError(Exception):
 
 @click.command()
 @click.option('--host', 'host', default='localhost')
-@click.option('--port', 'port', default=8011)
+@click.option('--port', 'port', default=8012)
 def main(host, port):
-    """Starts the Employee Catalog Agent server."""
+    """Starts the Service Catalog Agent server."""
     try:
         if not os.getenv('OPENAI_BASE_URL'):
             raise MissingURLError(
@@ -47,25 +47,38 @@ def main(host, port):
         capabilities = AgentCapabilities(streaming=True, push_notifications=True)
         skills = [
             AgentSkill(
-                id='get_employee_info',
-                name='Get Employee Information Tool',
-                description='Helps with retrieving information about current employees',
-                tags=['employee information'],
+                id='get_service_info',
+                name='Get Service Information Tool',
+                description=(
+                    'Helps with retrieving information about services in the catalog'),
+                tags=['service information'],
                 examples=[
-                    'What is the name of the employee with id 3?',
-                    'How many employees do we have?',
-                    'What is the id of Jane Doe?'
+                    'What services exist in the Productivity category?',
+                    'What service categories are there?',
+                ],
+            ),
+            AgentSkill(
+                id='get_service_access_requirements',
+                name='Get Service Access Requirements',
+                description=(
+                    'Provides information about what is required for a user to be '
+                    'given access to a particular service and what data is required to '
+                    'request access.'),
+                tags=['service access', 'service requirements'],
+                examples=[
+                    'What are the requirements of the user to access Office 365?',
+                    'What is required to request access to the HR Information System?',
                 ],
             ),
         ]
         agent_card = AgentCard(
-            name='Employee Catalog Agent',
+            name='Service Catalog Agent',
             description=(
-                'Helps with queries and updates to the employee catalog service'),
+                'Helps with requests for access to different services'),
             url=f'http://{host}:{port}/',
             version='1.0.0',
-            default_input_modes=EmployeeCatalogAgent.SUPPORTED_CONTENT_TYPES,
-            default_output_modes=EmployeeCatalogAgent.SUPPORTED_CONTENT_TYPES,
+            default_input_modes=ServiceCatalogAgent.SUPPORTED_CONTENT_TYPES,
+            default_output_modes=ServiceCatalogAgent.SUPPORTED_CONTENT_TYPES,
             capabilities=capabilities,
             skills=skills,
         )
@@ -76,7 +89,7 @@ def main(host, port):
         push_sender = BasePushNotificationSender(httpx_client=httpx_client,
                                                  config_store=push_config_store)
         request_handler = DefaultRequestHandler(
-            agent_executor=EmployeeCatalogAgentExecutor(),
+            agent_executor=ServiceCatalogAgentExecutor(),
             task_store=InMemoryTaskStore(),
             push_config_store=push_config_store,
             push_sender=push_sender
@@ -97,4 +110,5 @@ def main(host, port):
 
 
 if __name__ == '__main__':
+    main()
     main()

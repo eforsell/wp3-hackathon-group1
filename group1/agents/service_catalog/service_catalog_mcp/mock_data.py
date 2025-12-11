@@ -4,7 +4,8 @@ services = [
         "id": 1,
         "name": "Office 365",
         "category": "Productivity",
-        "description": "Complete office suite including Word, Excel, PowerPoint, and Teams",
+        "description": ("Complete office suite including Word, Excel, PowerPoint, "
+                        " and Teams"),
         "access_requirements": [
             "Active employment status",
             "Manager approval",

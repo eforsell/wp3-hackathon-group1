@@ -52,7 +52,7 @@ class EmployeeCatalogAgent:
         self.mcp_client = MultiServerMCPClient({  # type: ignore
             "employee_catalog": {
                 "transport": "http",
-                "url": "http://0.0.0.0:8002/mcp"
+                "url": "http://0.0.0.0:8001/mcp"
             }
         })
         self.tools = asyncio.run(self.mcp_client.get_tools())

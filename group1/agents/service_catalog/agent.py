@@ -36,8 +36,8 @@ class ServiceCatalogAgent:
 
     SYSTEM_INSTRUCTION = (
         'You are a helpful assistant tasked with retrieving and providing information '
-        'from the Service Catalog. Be friendly and helpful, and provide clear information '
-        'about available services and their requirements.'
+        'from the Service Catalog. Be friendly and helpful, and provide clear '
+        'information about available services and their requirements.'
     )
 
     def __init__(self):
@@ -51,7 +51,7 @@ class ServiceCatalogAgent:
         self.mcp_client = MultiServerMCPClient({  # type: ignore
             "service_catalog": {
                 "transport": "http",
-                "url": "http://0.0.0.0:8003/mcp"
+                "url": "http://0.0.0.0:8002/mcp"
             }
         })
         self.tools = asyncio.run(self.mcp_client.get_tools())

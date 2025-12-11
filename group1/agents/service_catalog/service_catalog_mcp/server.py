@@ -34,7 +34,9 @@ def get_service_by_name(name: str):
 @app.tool
 def get_services_by_category(category: str):
     """Returns all services in the given category."""
-    matching_services = [service for service in services if service["category"].lower() == category.lower()]
+    matching_services = [
+        service for service in services
+        if service["category"].lower() == category.lower()]
     if matching_services:
         return matching_services
     return {"error": "No services found in this category."}
@@ -55,8 +57,6 @@ def get_service_access_requirements(service_name: str):
 
 @app.prompt
 def purpose_prompt():
-    return "You are a service catalog assistant that helps users find available services and understand what data/requirements are needed to access them."
-
-
-if __name__ == "__main__":
-    app.run(transport="http", host="0.0.0.0", port=8003)
+    return (
+        "You are a service catalog assistant that helps users find available services "
+        "and understand what data/requirements are needed to access them.")
