@@ -18,7 +18,8 @@ The project structure includes an `agents` directory, which will contain the dif
 * **Install dependencies:**
 
     ```bash
-    pip install -e .
+    uv pip install -e .
+    uv add fastapi uvicorn langserve
     ```
 
 * **Run the application:**
@@ -69,3 +70,4 @@ After making any code changes, it is important to run the following quality chec
 ## Agent Specific Guidelines
 
 * **Langchain/Langgraph Documentation:** When making changes to `langchain` or `langgraph` code, always consult the `langchain-docs MCP server` for the most up-to-date documentation.
+* **FastMCP Documentation:** When making changes to `fastmcp` code, always consult the `fastmcp-docs MCP server` for the most up-to-date documentation.

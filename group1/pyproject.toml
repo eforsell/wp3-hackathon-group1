@@ -6,8 +6,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn>=0.29.0",
+    "langserve>=0.1.1",
     "faiss-cpu>=1.10.0",
-    "fastmcp>=2.13.1",
     "langchain>=1.1.3",
     "langchain-core>=1.0.0",
     "langchain-openai>=1.1.1",
@@ -17,6 +19,11 @@ dependencies = [
     "pandas>=2.3.2 ",
     "pydantic>=2.11.9",
     "python-dotenv>=1.2.1",
+    "fastmcp>=2.13.3",
+    "langchain-community>=0.4.1",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "mcp>=1.22.0",
 ]
 
 [dependency-groups]
