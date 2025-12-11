@@ -1,6 +1,8 @@
 from fastmcp import FastMCP
+from mcp.types import PromptMessage, TextContent
 
 from .mock_data import employees
+from .prompts import BASE_INSTRUCTIONS
 
 app = FastMCP(
     name="Employee Catalog MCP",
@@ -32,9 +34,6 @@ def get_employee_by_name(name: str):
 
 
 @app.prompt
-def purpose_prompt():
-    return "You're a bot"
-
-
-if __name__ == "__main__":
-    app.run(transport="http", host="0.0.0.0", port=8002)
+def base_prompt():
+    return PromptMessage(
+        role="assistant", content=TextContent(type="text", text=BASE_INSTRUCTIONS))

@@ -1,57 +1,127 @@
 import asyncio
 import os
+from collections.abc import AsyncIterable
+from typing import Any, Literal
 
-import langchain.messages
 from dotenv import load_dotenv
 from langchain.agents import create_agent
+from langchain_core.messages import AIMessage, ToolMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import MemorySaver
+from pydantic import BaseModel, Field
+
+memory = MemorySaver()
 
 load_dotenv(override=True)
 
-client = MultiServerMCPClient({  # type: ignore
-    "employee_catalog": {
-        "transport": "http",
-        "url": "http://0.0.0.0:8002/mcp"
-    }
-})
 
-llm = ChatOpenAI(
-    model="gpt-5.1",
-    reasoning_effort='minimal',
-    base_url=os.environ["OPENAI_BASE_URL"],
-    api_key=lambda: os.environ["OPENAI_API_KEY"],
-)
+class ResponseFormat(BaseModel):
+    """Respond to the user in this format."""
+
+    status: Literal['input_required', 'completed', 'error'] = Field(
+        default='input_required',
+        description=(
+            'Set response status to input_required if the user needs to provide more '
+            'information to complete the request. Set response status to error if '
+            'there is an error while processing the request. Set response status to '
+            'completed if the request is complete.'
+        )
+    )
+    message: str
 
 
-async def get_agent():
-    # Create the agent
+class EmployeeCatalogAgent:
+    """CurrencyAgent - a specialized assistant for currency convesions."""
 
-    tools = await client.get_tools()
-    return create_agent(
-        model=llm,
-        tools=tools
+    SYSTEM_INSTRUCTION = (
+        'Du är en hjälpsam assistent som har som uppgift att hämta och spara uppgifter '
+        'i Sjukhus ABCs personalkatalog. Ha en vänlig och hjälpsam ton och svara om '
+        'möjligt på Skånska.'
     )
 
+    def __init__(self):
+        self.model = ChatOpenAI(
+            model="gpt-5.1",
+            reasoning_effort='minimal',
+            base_url=os.environ["OPENAI_BASE_URL"],
+            api_key=lambda: os.environ["OPENAI_API_KEY"],
+        )
 
-async def main():
-    # Example of how to run the agent
-    agent = await get_agent()
-    base_messages = await client.get_prompt("employee_catalog", "base_prompt")
-    messages = [
-        langchain.messages.SystemMessage("""\
-Du är en hjälpsam assistent som har som uppgift att hämta och spara uppgifter i
-Sjukhus ABCs personalkatalog. Ha en vänlig och hjälpsam ton och svara om möjligt på
-Skånska.
-"""),
-        * base_messages,
-        # {'role': 'user', 'content': "What is the name of the employee with id 1?"},
-        langchain.messages.HumanMessage("What is the name of the employee with id 1?")
-    ]
+        self.mcp_client = MultiServerMCPClient({  # type: ignore
+            "employee_catalog": {
+                "transport": "http",
+                "url": "http://0.0.0.0:8002/mcp"
+            }
+        })
+        self.tools = asyncio.run(self.mcp_client.get_tools())
 
-    async for event in agent.astream_events({'messages': messages}):
-        print(event)
+        self.graph = create_agent(
+            model=self.model,
+            tools=self.tools,
+            checkpointer=memory,
+            system_prompt=self.SYSTEM_INSTRUCTION,
+            response_format=ResponseFormat,
+        )
 
+    async def stream(self, query, context_id) -> AsyncIterable[dict[str, Any]]:
+        inputs = {'messages': [('user', query)]}
+        config = {'configurable': {'thread_id': context_id}}
 
-if __name__ == "__main__":
-    asyncio.run(main())
+        for item in self.graph.stream(
+                input=inputs, config=config, stream_mode='values'):  # type: ignore
+            message = item['messages'][-1]
+            if (
+                isinstance(message, AIMessage)
+                and message.tool_calls
+                and len(message.tool_calls) > 0
+            ):
+                yield {
+                    'is_task_complete': False,
+                    'require_user_input': False,
+                    'content': 'Interacting with the employee catalog...',
+                }
+            elif isinstance(message, ToolMessage):
+                yield {
+                    'is_task_complete': False,
+                    'require_user_input': False,
+                    'content': 'Processing the results...',
+                }
+
+        yield self.get_agent_response(config)
+
+    def get_agent_response(self, config):
+        current_state = self.graph.get_state(config)
+        structured_response = current_state.values.get('structured_response')
+        if structured_response and isinstance(
+            structured_response, ResponseFormat
+        ):
+            if structured_response.status == 'input_required':
+                return {
+                    'is_task_complete': False,
+                    'require_user_input': True,
+                    'content': structured_response.message,
+                }
+            if structured_response.status == 'error':
+                return {
+                    'is_task_complete': False,
+                    'require_user_input': True,
+                    'content': structured_response.message,
+                }
+            if structured_response.status == 'completed':
+                return {
+                    'is_task_complete': True,
+                    'require_user_input': False,
+                    'content': structured_response.message,
+                }
+
+        return {
+            'is_task_complete': False,
+            'require_user_input': True,
+            'content': (
+                'We are unable to process your request at the moment. '
+                'Please try again.'
+            ),
+        }
+
+    SUPPORTED_CONTENT_TYPES = ['text', 'text/plain']
