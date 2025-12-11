@@ -65,3 +65,7 @@ After making any code changes, it is important to run the following quality chec
 * `agents/`: Directory containing the agent implementations.
   * `service_catalog/`: The service catalog agent.
   * `employee_catalog/`: The employee catalog agent.
+
+## Agent Specific Guidelines
+
+* **Langchain/Langgraph Documentation:** When making changes to `langchain` or `langgraph` code, always consult the `langchain-docs MCP server` for the most up-to-date documentation.
