@@ -31,7 +31,7 @@ class ResponseFormat(BaseModel):
     message: str
 
 
-class EmployeeCatalogAgnet:
+class EmployeeCatalogAgent:
     """CurrencyAgent - a specialized assistant for currency convesions."""
 
     SYSTEM_INSTRUCTION = (

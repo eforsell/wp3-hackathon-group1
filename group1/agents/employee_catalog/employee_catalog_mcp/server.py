@@ -38,6 +38,3 @@ def base_prompt():
     return PromptMessage(
         role="assistant", content=TextContent(type="text", text=BASE_INSTRUCTIONS))
 
-
-if __name__ == "__main__":
-    app.run(transport="http", host="0.0.0.0", port=8002)
