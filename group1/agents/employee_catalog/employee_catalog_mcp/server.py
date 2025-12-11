@@ -37,4 +37,3 @@ def get_employee_by_name(name: str):
 def base_prompt():
     return PromptMessage(
         role="assistant", content=TextContent(type="text", text=BASE_INSTRUCTIONS))
-
