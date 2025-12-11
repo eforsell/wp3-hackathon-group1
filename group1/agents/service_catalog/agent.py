@@ -17,7 +17,8 @@ client = MultiServerMCPClient({  # type: ignore
 })
 
 llm = ChatOpenAI(
-    model="gpt-4o-mini",
+    model="gpt-5.1",
+    reasoning_effort='minimal',
     base_url=os.environ["OPENAI_BASE_URL"],
     api_key=lambda: os.environ["OPENAI_API_KEY"],
 )
@@ -39,10 +40,10 @@ async def main():
     base_messages = await client.get_prompt("service_catalog", "purpose_prompt")
     messages = [
         langchain.messages.SystemMessage("""\
-You are a helpful assistant tasked with retrieving and providing information from
-the Service Catalog. Be friendly and helpful, and provide clear information about
-available services and their requirements.
-"""),
+            Du är en hjälpsam assistent som har till uppgift att hämta och tillhandahålla 
+            information från Tjänstekatalogen. Var vänlig och hjälpsam, och ge tydlig 
+            information om tillgängliga tjänster och deras krav.
+            """),
         * base_messages,
         langchain.messages.HumanMessage("What services are available in the 'Productivity' category?")
     ]
