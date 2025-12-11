@@ -17,7 +17,8 @@ client = MultiServerMCPClient({  # type: ignore
 })
 
 llm = ChatOpenAI(
-    model="gpt-4o-mini",
+    model="gpt-5.1",
+    reasoning_effort='minimal',
     base_url=os.environ["OPENAI_BASE_URL"],
     api_key=lambda: os.environ["OPENAI_API_KEY"],
 )
@@ -36,17 +37,20 @@ async def get_agent():
 async def main():
     # Example of how to run the agent
     agent = await get_agent()
+    base_messages = await client.get_prompt("employee_catalog", "base_prompt")
     messages = [
-        {'role': 'system', 'content': "You are a helpful assistant"},
-        {'role': 'user', 'content': "What is the name of the employee with id 1?"},
+        langchain.messages.SystemMessage("""\
+Du är en hjälpsam assistent som har som uppgift att hämta och spara uppgifter i
+Sjukhus ABCs personalkatalog. Ha en vänlig och hjälpsam ton och svara om möjligt på
+Skånska.
+"""),
+        * base_messages,
+        # {'role': 'user', 'content': "What is the name of the employee with id 1?"},
+        langchain.messages.HumanMessage("What is the name of the employee with id 1?")
     ]
-    response = await agent.ainvoke({'messages': messages})
-    print(response)
-    # messages.append(response)
 
-    # # Print messages
-    # for message in messages:
-    #     print()
+    async for event in agent.astream_events({'messages': messages}):
+        print(event)
 
 
 if __name__ == "__main__":
