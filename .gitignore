@@ -208,3 +208,6 @@ __marimo__/
 
 # Mac
 .DS_Store
+
+# A Team stuff
+a_team/schedule/updated_calendars/
