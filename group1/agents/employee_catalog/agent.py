@@ -1,36 +1,38 @@
 import os
 
-import requests
-import yaml
 from dotenv import load_dotenv
-from langchain_community.agent_toolkits.openapi.planner import create_openapi_agent
-from langchain_community.agent_toolkits.openapi.spec import ReducedOpenAPISpec
-from langchain_community.utilities.requests import TextRequestsWrapper
+from langchain.agents import create_agent
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
-
-# Load the OpenAPI spec from the running MCP server
-response = requests.get("http://localhost:8002/openapi.json")
-spec_dict = yaml.safe_load(response.text)
-spec = ReducedOpenAPISpec.from_dict(spec_dict)
 
 load_dotenv()
 
-# Create the agent
+client = MultiServerMCPClient({  # type: ignore
+    "employee_catalog": {
+        "transport": "http",
+        "url": "http://0.0.0.0:8002/mcp"
+    }
+})
+
 llm = ChatOpenAI(
     model="gpt-4o-mini",
     base_url=os.environ["OPENAI_BASE_URL"],
-    api_key=lambda: os.environ["OPENAI_API_KEY"]
+    api_key=lambda: os.environ["OPENAI_API_KEY"],
 )
-requests_wrapper = TextRequestsWrapper()
-agent = create_openapi_agent(
-    spec,
-    requests_wrapper,
-    llm,
-    allow_dangerous_requests=True,
-)
+
+
+async def get_agent():
+    # Create the agent
+
+    tools = await client.get_tools()
+    return create_agent(
+        model=llm,
+        tools=tools
+    )
 
 
 if __name__ == "__main__":
     # Example of how to run the agent
+    agent = await get_agent()
     response = agent.invoke({"input": "What is the name of the employee with id 1?"})
     print(response)
