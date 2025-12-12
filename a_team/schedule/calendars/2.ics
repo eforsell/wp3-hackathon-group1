@@ -1,0 +1,48 @@
+BEGIN:VCALENDAR
+PRODID:-//Microsoft Corporation//Outlook 16.0 MIMEDIR//EN
+VERSION:2.0
+BEGIN:VEVENT
+DESCRIPTION:Genomgång av månadsbudget och bemanningsbehov
+LOCATION:Konferensrum 3B, Huvudbyggnaden
+DTSTART:20251201T080000Z
+DTEND:20251201T090000Z
+SUMMARY:Månadsbudgetmöte
+UID:a1@unit.org
+END:VEVENT
+
+BEGIN:VEVENT
+DESCRIPTION:Planering av investeringsbehov inför kommande år
+LOCATION:Ekonomiavdelningen, plan 2
+DTSTART:20251201T093000Z
+DTEND:20251201T103000Z
+SUMMARY:Investeringsplanering
+UID:a2@unit.org
+END:VEVENT
+
+BEGIN:VEVENT
+DESCRIPTION:Uppföljning av vårdskador och kvalitetsmått
+LOCATION:Mötesrum 1A, Administrationshuset
+DTSTART:20251201T110000Z
+DTEND:20251201T120000Z
+SUMMARY:Kvalitetsmöte
+UID:a3@unit.org
+END:VEVENT
+
+BEGIN:VEVENT
+DESCRIPTION:Samverkan med personalrepresentanter kring arbetsmiljö
+LOCATION:Personalavdelningen, plan 4
+DTSTART:20251201T123000Z
+DTEND:20251201T133000Z
+SUMMARY:Arbetsmiljöråd
+UID:a4@unit.org
+END:VEVENT
+
+BEGIN:VEVENT
+DESCRIPTION:Årlig genomgång av avdelningens mål och strategier
+LOCATION:Stora konferenssalen
+DTSTART:20251201T150000Z
+DTEND:20251201T160000Z
+SUMMARY:Strategiskt verksamhetsmöte
+UID:a5@unit.org
+END:VEVENT
+END:VCALENDAR

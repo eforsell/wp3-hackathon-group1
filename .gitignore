@@ -211,3 +211,5 @@ __marimo__/
 
 # GitHub workflows and templates
 .github/
+# A Team stuff
+a_team/schedule/updated_calendars/

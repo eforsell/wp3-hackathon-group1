@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Microsoft Corporation//Outlook 16.0 MIMEDIR//EN
+BEGIN:VEVENT
+DESCRIPTION:Morgonrapport med nattpersonal och övrigt team. Genomgång av inlagda patienter, nattens händelser och planering av dagens arbete.
+DTSTART:20251201T080000Z
+DTEND:20251201T083000Z
+LOCATION:Avdelningens personalrum
+SUMMARY:Morgonrapport
+UID:20251201T080000Z-morgonrapport@exempel.se
+END:VEVENT
+
+BEGIN:VEVENT
+DESCRIPTION:Rondförberedelse med fokus på labbvärden, status, omvårdnadsbehov och ordinationer inför läkarens rond med patienterna.
+DTSTART:20251201T083000Z
+DTEND:20251201T090000Z
+LOCATION:Avdelningens expedition
+SUMMARY:Rondförberedelse
+UID:20251201T083000Z-rondforberedelse@exempel.se
+END:VEVENT
+END:VCALENDAR
